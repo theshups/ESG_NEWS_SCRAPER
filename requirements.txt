@@ -9,3 +9,9 @@ transformers
 torch==2.12.0
 huggingface_hub==1.15.0
 playwright
+fastapi
+uvicorn
+jinja2
+aiofiles
+google-genai
+schedule

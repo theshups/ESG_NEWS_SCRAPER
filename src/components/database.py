@@ -1,15 +1,14 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 from typing import Any
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, func, select, text, text
+from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.orm import Session
 
 from src.components.base import BaseStorage
 from src.components.models import Base, ESGArticle
-from src.components.scraper import Article
 from src.exception import ConfigError, StorageError
 from src.logger import get_logger
 
@@ -18,19 +17,16 @@ log = get_logger(__name__)
 
 
 def _build_url() -> str:
-    pw = os.getenv("POSTGRES_PASSWORD", "shups.69")
+    pw = os.getenv("POSTGRES_PASSWORD", "")
     if not pw:
-        raise ConfigError(
-            "POSTGRES_PASSWORD is not set.\n"
-            "  1. Copy .env.example → .env\n"
-            "  2. Fill in your postgres password\n"
-            "  3. Make sure PostgreSQL is running"
-        )
-    host = os.getenv("POSTGRES_HOST", "localhost")
-    port = os.getenv("POSTGRES_PORT", "5432")
-    db   = os.getenv("POSTGRES_DB",   "esg_intel")
-    user = os.getenv("POSTGRES_USER", "postgres")
-    return f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        raise ConfigError("POSTGRES_PASSWORD is not set in .env")
+    return (
+        "postgresql+psycopg2://"
+        + os.getenv("POSTGRES_USER", "postgres") + ":" + pw
+        + "@" + os.getenv("POSTGRES_HOST", "localhost")
+        + ":" + os.getenv("POSTGRES_PORT", "5432")
+        + "/" + os.getenv("POSTGRES_DB", "esg_intel")
+    )
 
 
 class PostgreSQLStorage(BaseStorage):
@@ -41,33 +37,42 @@ class PostgreSQLStorage(BaseStorage):
                 url or _build_url(),
                 pool_size=5,
                 max_overflow=10,
-                pool_pre_ping=True,   # auto-reconnect stale connections
+                pool_pre_ping=True,
                 echo=False,
             )
             self.setup()
         except ConfigError:
             raise
         except Exception as e:
-            raise StorageError(
-                f"cannot connect to PostgreSQL: {e}\n"
-                "  Make sure postgres is running and your .env credentials are correct."
-            )
+            raise StorageError("cannot connect to PostgreSQL: " + str(e))
 
-    def setup(self) -> None:    # override
+    def setup(self) -> None:
         Base.metadata.create_all(self._engine)
+        migrations = [
+            "ALTER TABLE esg_articles ADD COLUMN IF NOT EXISTS fetched_via VARCHAR(20)",
+            "ALTER TABLE esg_articles ADD COLUMN IF NOT EXISTS gemini_summary TEXT",
+        ]
+        with self._engine.begin() as conn:
+            for sql in migrations:
+                try:
+                    conn.execute(text(sql))
+                except Exception:
+                    pass
         log.info("postgres schema ready")
 
-    def save(self, articles: list[Article]) -> int:    # override
+    def save(self, articles: list) -> int:
         if not articles:
             return 0
-
         inserted = 0
         with Session(self._engine) as session:
             for a in articles:
-                # check by primary key — skip if we already have it
                 if session.get(ESGArticle, a.article_id):
                     continue
-
+                existing = session.scalar(
+                    select(ESGArticle).where(ESGArticle.url == a.url).limit(1)
+                )
+                if existing:
+                    continue
                 session.add(ESGArticle(
                     article_id          = a.article_id,
                     title               = a.title,
@@ -78,34 +83,57 @@ class PostgreSQLStorage(BaseStorage):
                     body_text           = a.body_text,
                     esg_category        = a.esg_category,
                     category_confidence = a.confidence,
-                    fetched_via         = a.fetched_via,
+                    fetched_via         = getattr(a, "fetched_via", "requests"),
                 ))
                 inserted += 1
-
             session.commit()
-
-        log.info(f"saved {inserted} new  /  {len(articles) - inserted} duplicates skipped")
+        log.info("saved " + str(inserted) + " new  /  " + str(len(articles) - inserted) + " duplicates skipped")
         return inserted
 
-    def recent(self, n: int = 20) -> list[dict]:    # override
+    def recent(self, n: int = 50) -> list:
         with Session(self._engine) as session:
             rows = session.scalars(
                 select(ESGArticle)
                 .order_by(ESGArticle.published_date.desc().nullslast())
                 .limit(n)
             ).all()
-            return [_row_dict(r) for r in rows]
+            return [_to_dict(r) for r in rows]
 
-    def summary(self) -> dict[str, Any]:    # override
+    def get_by_id(self, article_id: str):
+        with Session(self._engine) as session:
+            row = session.get(ESGArticle, article_id)
+            return _to_dict(row) if row else None
+
+    def get_by_category(self, category: str, n: int = 50) -> list:
+        with Session(self._engine) as session:
+            rows = session.scalars(
+                select(ESGArticle)
+                .where(ESGArticle.esg_category == category)
+                .order_by(ESGArticle.published_date.desc())
+                .limit(n)
+            ).all()
+            return [_to_dict(r) for r in rows]
+
+    def save_summary(self, article_id: str, summary: str) -> None:
+        with Session(self._engine) as session:
+            row = session.get(ESGArticle, article_id)
+            if row:
+                row.gemini_summary = summary
+                session.commit()
+
+    def get_summary(self, article_id: str) -> str:
+        with Session(self._engine) as session:
+            row = session.get(ESGArticle, article_id)
+            return (row.gemini_summary or "") if row else ""
+
+    def summary(self) -> dict:
         with Session(self._engine) as session:
             total = session.scalar(select(func.count()).select_from(ESGArticle))
-
             per_source = session.execute(
                 select(ESGArticle.source_name, func.count().label("cnt"))
                 .group_by(ESGArticle.source_name)
                 .order_by(func.count().desc())
             ).all()
-
             per_cat = session.execute(
                 select(
                     func.coalesce(ESGArticle.esg_category, "Unclassified").label("cat"),
@@ -114,39 +142,34 @@ class PostgreSQLStorage(BaseStorage):
                 .group_by("cat")
                 .order_by(func.count().desc())
             ).all()
-
             per_via = session.execute(
-                select(ESGArticle.fetched_via, func.count().label("cnt"))
-                .group_by(ESGArticle.fetched_via)
+                select(
+                    func.coalesce(ESGArticle.fetched_via, "unknown").label("via"),
+                    func.count().label("cnt"),
+                )
+                .group_by("via")
             ).all()
-
         return {
             "total":       total or 0,
             "by_source":   {r.source_name: r.cnt for r in per_source},
             "by_category": {r.cat: r.cnt for r in per_cat},
-            "by_method":   {r.fetched_via: r.cnt for r in per_via},
+            "by_method":   {r.via: r.cnt for r in per_via},
         }
 
-    def get_by_category(self, category: str, n: int = 10) -> list[dict]:
-        with Session(self._engine) as session:
-            rows = session.scalars(
-                select(ESGArticle)
-                .where(ESGArticle.esg_category == category)
-                .order_by(ESGArticle.published_date.desc())
-                .limit(n)
-            ).all()
-            return [_row_dict(r) for r in rows]
 
-
-def _row_dict(row: ESGArticle) -> dict:
+def _to_dict(row) -> dict:
+    if row is None:
+        return {}
     return {
-        "article_id": row.article_id,
-        "title":      row.title,
-        "url":        row.url,
-        "date":       row.published_date.isoformat() if row.published_date else None,
-        "source":     row.source_name,
-        "author":     row.author,
-        "category":   row.esg_category,
-        "confidence": row.category_confidence,
-        "via":        row.fetched_via,
+        "article_id":     row.article_id,
+        "title":          row.title,
+        "url":            row.url,
+        "date":           row.published_date.isoformat() if row.published_date else None,
+        "source":         row.source_name,
+        "author":         row.author,
+        "category":       row.esg_category,
+        "confidence":     row.category_confidence,
+        "body_text":      row.body_text,
+        "gemini_summary": row.gemini_summary,
+        "via":            row.fetched_via,
     }
