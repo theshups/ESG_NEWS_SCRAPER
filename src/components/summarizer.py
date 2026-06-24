@@ -1,63 +1,102 @@
 ﻿from __future__ import annotations
-
-import os
+import re
 from src.logger import get_logger
 
 log = get_logger(__name__)
+MODEL = "falconsai/text_summarization"
 
 
-class GeminiSummarizer:
+class Summarizer:
 
     def __init__(self):
-        self._client = None
-        api_key = os.getenv("GEMINI_API_KEY", "")
-        if not api_key:
-            log.warning("GEMINI_API_KEY not set - summaries will be skipped")
-            return
-        try:
-            from google import genai
-            self._client = genai.Client(api_key=api_key)
-            log.info("Gemini summarizer ready")
-        except Exception as e:
-            log.warning("Gemini init failed: " + str(e))
+        self._pipe  = None
+        self._tried = False
 
     @property
-    def enabled(self) -> bool:
-        return self._client is not None
+    def ready(self) -> bool:
+        return self._pipe is not None
 
-    def summarize(self, title: str, body: str) -> str:
-        if not self.enabled or not (body or title):
-            return ""
-        for model in ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-pro"]:
+    def load(self) -> None:
+        if self._tried:
+            return
+        self._tried = True
+
+        # try each task name in order until one works
+        for task in ["summarization", "text2text-generation"]:
             try:
-                text = (body or title)[:4_000]
-                prompt = (
-                    "You are an expert ESG analyst. Read the following news article and write a thorough summary.\n\n"
-                    "Your response must follow this exact format:\n\n"
-                    "OVERVIEW\n"
-                    "Write 3 to 4 complete sentences explaining what happened, who is involved, and why it matters from an ESG perspective.\n\n"
-                    "KEY POINTS\n"
-                    "- Point one: a specific fact, number, or action from the article\n"
-                    "- Point two: another specific detail or implication\n"
-                    "- Point three: the broader ESG significance or impact\n\n"
-                    "ESG IMPACT\n"
-                    "Write 2 sentences on the real-world ESG implications of this news.\n\n"
-                    "Now summarize this article:\n\n"
-                    "Title: " + title + "\n\n"
-                    "Content: " + text
+                from transformers import pipeline
+                log.info("Loading local AI model with task=" + task)
+                self._pipe = pipeline(
+                    task,
+                    model=MODEL,
+                    device=-1,
+                    truncation=True,
                 )
-                response = self._client.models.generate_content(
-                    model=model,
-                    contents=prompt,
-                )
-                log.info("Gemini summary generated using " + model)
-                return response.text.strip()
+                log.info("Local AI model ready (task=" + task + ")")
+                self._task = task
+                return
             except Exception as e:
                 err = str(e)
-                if "429" in err or "RESOURCE_EXHAUSTED" in err:
-                    log.warning(model + " quota exhausted, trying next model")
+                if "Unknown task" in err or "available tasks" in err:
+                    log.debug("Task " + task + " not available, trying next")
                     continue
-                log.debug("Gemini error on " + model + ": " + err)
+                log.warning("Could not load model: " + err)
+                return
+
+        log.warning("No working task found for " + MODEL)
+
+    def summarize(self, title: str, body: str) -> str:
+        text = (body or "").strip()
+        if len(text) < 50:
+            text = (title or "").strip()
+        if not text or not self._pipe:
+            return ""
+
+        text = text[:1_024]
+
+        try:
+            result = self._pipe(
+                text,
+                max_length=200,
+                min_length=60,
+                do_sample=False,
+                clean_up_tokenization_spaces=True,
+            )
+            # both tasks return list of dicts but with different keys
+            raw = (
+                result[0].get("summary_text") or
+                result[0].get("generated_text") or ""
+            ).strip()
+            if not raw:
                 return ""
-        log.warning("All Gemini models exhausted quota")
-        return ""
+            return self._format(title, body or text, raw)
+        except Exception as e:
+            log.warning("Summarizer error: " + str(e))
+            return ""
+
+    def _format(self, title: str, body: str, raw: str) -> str:
+        sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", raw) if s.strip()]
+        overview = " ".join(sents[:2]) if len(sents) >= 2 else raw
+
+        points = list(sents[2:])
+        if len(points) < 3:
+            body_sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", body) if len(s.strip()) > 40]
+            for s in body_sents:
+                if s[:140] not in " ".join(points):
+                    points.append(s[:140])
+                if len(points) >= 3:
+                    break
+        if not points:
+            points = ["Refer to the full article for additional details."]
+
+        esg_impact = sents[-1] if len(sents) >= 3 else (
+            "This story carries significant implications for ESG compliance, "
+            "sustainability strategy, and stakeholder reporting."
+        )
+
+        out  = "OVERVIEW\n" + overview + "\n\n"
+        out += "KEY POINTS\n"
+        for p in points[:3]:
+            out += "- " + p + "\n"
+        out += "\nESG IMPACT\n" + esg_impact
+        return out
