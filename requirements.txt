@@ -1,0 +1,11 @@
+requests==2.31.0
+beautifulsoup4==4.15.0
+lxml
+PyYAML==6.0.3
+python-dotenv==1.2.2
+SQLAlchemy==2.0.49
+psycopg2-binary
+transformers
+torch==2.12.0
+huggingface_hub==1.15.0
+playwright
