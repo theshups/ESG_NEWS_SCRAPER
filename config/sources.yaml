@@ -2,59 +2,74 @@
   - name: "ESG News"
     rss_url: "https://esgnews.com/feed/"
     use_browser: false
+    use_stealth: false
 
   - name: "ESG Today"
     rss_url: "https://www.esgtoday.com/feed/"
     use_browser: false
+    use_stealth: false
 
   - name: "Responsible Investor"
     rss_url: "https://www.responsible-investor.com/feed/"
     use_browser: false
+    use_stealth: false
 
   - name: "Carbon Brief"
     rss_url: "https://www.carbonbrief.org/feed/"
     use_browser: false
+    use_stealth: false
 
   - name: "Climate Home News"
     rss_url: "https://www.climatechangenews.com/feed/"
     use_browser: false
+    use_stealth: false
 
   - name: "The Guardian Environment"
     rss_url: "https://www.theguardian.com/environment/rss"
     use_browser: false
+    use_stealth: false
 
   - name: "BBC Environment"
     rss_url: "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml"
     use_browser: false
-
-  - name: "Electrek"
-    rss_url: "https://electrek.co/feed/"
-    use_browser: false
+    use_stealth: false
 
   - name: "EEA Press Releases"
     rss_url: "https://www.eea.europa.eu/en/newsroom/rss-feeds/eeas-press-releases-rss/rss.xml"
     use_browser: false
+    use_stealth: false
 
   - name: "EC Environment News"
     rss_url: "https://environment.ec.europa.eu/node/92/rss_en"
     use_browser: false
-
-  - name: "Politico Sustainability"
-    rss_url: "https://www.politico.eu/section/sustainability/feed/"
-    use_browser: false
-
-  - name: "Politico Energy"
-    rss_url: "https://www.politico.eu/section/energy/feed/"
-    use_browser: false
+    use_stealth: false
 
   - name: "EUobserver"
     rss_url: "https://euobserver.com/rss/"
     use_browser: false
+    use_stealth: false
 
   - name: "GreenBiz"
     rss_url: "https://www.greenbiz.com/feed"
     use_browser: true
+    use_stealth: false
+
+  - name: "Electrek"
+    rss_url: "https://electrek.co/feed/"
+    use_browser: true
+    use_stealth: false
+
+  - name: "Politico Sustainability"
+    rss_url: "https://www.politico.eu/section/sustainability/feed/"
+    use_browser: true
+    use_stealth: false
+
+  - name: "Politico Energy"
+    rss_url: "https://www.politico.eu/section/energy/feed/"
+    use_browser: true
+    use_stealth: false
 
   - name: "Inside Climate News"
     rss_url: "https://insideclimatenews.org/feed/"
-    use_browser: true
+    use_browser: false
+    use_stealth: true
