@@ -67,7 +67,7 @@ class StealthScraper(BaseScraper):
 
         # check stealth is installed
         try:
-            from playwright_stealth import stealth_sync
+            from playwright_stealth import stealth_sync  # type: ignore[import]
         except ImportError:
             raise BrowserError(
                 "playwright-stealth not installed — run: pip install playwright-stealth",
