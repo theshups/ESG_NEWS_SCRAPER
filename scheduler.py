@@ -1,10 +1,3 @@
-"""
-scheduler.py — runs the ESG pipeline on a daily schedule.
-
-Usage:
-    python scheduler.py          # runs immediately then every day at 06:00, 12:00, 18:00
-    python scheduler.py --once   # single run and exit
-"""
 import argparse
 import subprocess
 import sys
@@ -40,7 +33,7 @@ if __name__ == "__main__":
     schedule.every().day.at("12:00").do(run_pipeline)
     schedule.every().day.at("18:00").do(run_pipeline)
 
-    print("scheduler running — pipeline will execute at 06:00, 12:00, 18:00 daily")
+    print("scheduler running pipeline will execute at 06:00, 12:00, 18:00 daily")
     print("press Ctrl+C to stop\n")
 
     while True:

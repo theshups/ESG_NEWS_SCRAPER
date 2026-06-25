@@ -121,6 +121,29 @@ class PostgreSQLStorage(BaseStorage):
                 row.gemini_summary = summary
                 session.commit()
 
+    def delete_old_articles(self, days: int = 7) -> int:
+        """
+        Hard deletes all articles whose published_date is older than `days`.
+        Called at the end of every pipeline run to keep the DB fresh.
+        Returns the number of rows deleted.
+        """
+        from datetime import datetime, timedelta, timezone
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        deleted = 0
+        with Session(self._engine) as session:
+            old_rows = session.scalars(
+                select(ESGArticle).where(ESGArticle.published_date < cutoff)
+            ).all()
+            deleted = len(old_rows)
+            for row in old_rows:
+                session.delete(row)
+            session.commit()
+        if deleted:
+            log.info("Deleted " + str(deleted) + " articles older than " + str(days) + " days")
+        else:
+            log.info("No articles older than " + str(days) + " days found")
+        return deleted
+
     def get_summary(self, article_id: str) -> str:
         with Session(self._engine) as session:
             row = session.get(ESGArticle, article_id)

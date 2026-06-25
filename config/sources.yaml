@@ -1,50 +1,60 @@
-feeds:
+﻿feeds:
   - name: "ESG News"
     rss_url: "https://esgnews.com/feed/"
     use_browser: false
-    fetch_full_text: false
 
   - name: "ESG Today"
     rss_url: "https://www.esgtoday.com/feed/"
     use_browser: false
-    fetch_full_text: false
+
+  - name: "Responsible Investor"
+    rss_url: "https://www.responsible-investor.com/feed/"
+    use_browser: false
 
   - name: "Carbon Brief"
     rss_url: "https://www.carbonbrief.org/feed/"
     use_browser: false
-    fetch_full_text: false
-
-  - name: "Responsible Investor"
-    rss_url: "https://www.responsible-investor.com/rss/"
-    use_browser: false
-    fetch_full_text: false
 
   - name: "Climate Home News"
     rss_url: "https://www.climatechangenews.com/feed/"
     use_browser: false
-    fetch_full_text: false
-
-  - name: "GreenBiz"
-    rss_url: "https://www.greenbiz.com/feeds/news"
-    use_browser: true
-    fetch_full_text: false
-
-  - name: "Yale Environment 360"
-    rss_url: "https://e360.yale.edu/feed"
-    use_browser: false
-    fetch_full_text: false
 
   - name: "The Guardian Environment"
     rss_url: "https://www.theguardian.com/environment/rss"
     use_browser: false
-    fetch_full_text: false
 
   - name: "BBC Environment"
     rss_url: "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml"
     use_browser: false
-    fetch_full_text: false
 
-  - name: "UN Environment"
-    rss_url: "https://www.unep.org/rss.xml"
+  - name: "Electrek"
+    rss_url: "https://electrek.co/feed/"
     use_browser: false
-    fetch_full_text: false
+
+  - name: "EEA Press Releases"
+    rss_url: "https://www.eea.europa.eu/en/newsroom/rss-feeds/eeas-press-releases-rss/rss.xml"
+    use_browser: false
+
+  - name: "EC Environment News"
+    rss_url: "https://environment.ec.europa.eu/node/92/rss_en"
+    use_browser: false
+
+  - name: "Politico Sustainability"
+    rss_url: "https://www.politico.eu/section/sustainability/feed/"
+    use_browser: false
+
+  - name: "Politico Energy"
+    rss_url: "https://www.politico.eu/section/energy/feed/"
+    use_browser: false
+
+  - name: "EUobserver"
+    rss_url: "https://euobserver.com/rss/"
+    use_browser: false
+
+  - name: "GreenBiz"
+    rss_url: "https://www.greenbiz.com/feed"
+    use_browser: true
+
+  - name: "Inside Climate News"
+    rss_url: "https://insideclimatenews.org/feed/"
+    use_browser: true

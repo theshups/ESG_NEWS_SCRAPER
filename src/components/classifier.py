@@ -13,8 +13,6 @@ TEXT_LIMIT = 1_024
 
 # --------------------------------------------------------------------------- #
 #  Expanded keyword banks                                                       #
-#  Each bank covers the full breadth of each ESG pillar so even obliquely      #
-#  worded articles still get classified correctly.                              #
 # --------------------------------------------------------------------------- #
 
 _KEYWORDS: dict[str, list[str]] = {

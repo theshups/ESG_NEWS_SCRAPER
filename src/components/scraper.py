@@ -11,6 +11,7 @@ from typing import Optional
 
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 from src.components.base import BaseScraper
+from dataclasses import dataclass as _dc
 from src.exception import BrowserError, FeedFetchError, FeedParseError
 from src.logger import get_logger
 
@@ -59,6 +60,7 @@ class FeedConfig:
     url:             str
     use_browser:     bool = False
     fetch_full_text: bool = False
+    use_stealth:     bool = False
 
 
 def _make_soup(content: str) -> BeautifulSoup:
@@ -156,7 +158,10 @@ class ESGScraper(BaseScraper):
 
         for i, config in enumerate(self._feeds):
             try:
-                if config.use_browser:
+                if config.use_stealth:
+                    from src.components.stealth_scraper import StealthScraper
+                    parser = StealthScraper(config)
+                elif config.use_browser:
                     parser = BrowserFeedParser(config)
                 else:
                     parser = RSSFeedParser(config, session=session)
