@@ -1,9 +1,8 @@
 import argparse
 import subprocess
 import sys
-import schedule
 import time
-from datetime import datetime
+from datetime import datetime, time as dt_time
 
 
 def run_pipeline():
@@ -28,14 +27,20 @@ if __name__ == "__main__":
     if args.once:
         sys.exit(0)
 
-    # schedule three daily runs
-    schedule.every().day.at("06:00").do(run_pipeline)
-    schedule.every().day.at("12:00").do(run_pipeline)
-    schedule.every().day.at("18:00").do(run_pipeline)
+    schedule_times = [dt_time(6, 0), dt_time(12, 0), dt_time(18, 0)]
+    last_run_time = None
 
     print("scheduler running pipeline will execute at 06:00, 12:00, 18:00 daily")
     print("press Ctrl+C to stop\n")
 
     while True:
-        schedule.run_pending()
+        now = datetime.now()
+        current_time = now.time().replace(second=0, microsecond=0)
+
+        if current_time in schedule_times and last_run_time != current_time:
+            run_pipeline()
+            last_run_time = current_time
+        elif current_time not in schedule_times:
+            last_run_time = None
+
         time.sleep(30)
