@@ -1,4 +1,5 @@
 ﻿feeds:
+  # --- RSS (requests) ---
   - name: "ESG News"
     rss_url: "https://esgnews.com/feed/"
     use_browser: false
@@ -49,27 +50,29 @@
     use_browser: false
     use_stealth: false
 
+  # --- Browser (Playwright — use main site URL not feed URL) ---
   - name: "GreenBiz"
-    rss_url: "https://www.greenbiz.com/feed"
+    rss_url: "https://www.greenbiz.com/news"
     use_browser: true
     use_stealth: false
 
   - name: "Electrek"
-    rss_url: "https://electrek.co/feed/"
+    rss_url: "https://electrek.co/guides/electric-cars/"
     use_browser: true
     use_stealth: false
 
   - name: "Politico Sustainability"
-    rss_url: "https://www.politico.eu/section/sustainability/feed/"
+    rss_url: "https://www.politico.eu/section/sustainability/"
     use_browser: true
     use_stealth: false
 
   - name: "Politico Energy"
-    rss_url: "https://www.politico.eu/section/energy/feed/"
+    rss_url: "https://www.politico.eu/section/energy/"
     use_browser: true
     use_stealth: false
 
+  # --- Stealth (Playwright with anti-detection) ---
   - name: "Inside Climate News"
-    rss_url: "https://insideclimatenews.org/feed/"
+    rss_url: "https://insideclimatenews.org/news/"
     use_browser: false
     use_stealth: true

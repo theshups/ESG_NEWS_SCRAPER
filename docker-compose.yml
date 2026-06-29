@@ -12,10 +12,11 @@
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-esg_intel}"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
 
   app:
     build: .
@@ -29,12 +30,14 @@
       POSTGRES_DB:       ${POSTGRES_DB:-esg_intel}
       POSTGRES_USER:     ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      GEMINI_API_KEY:    ${GEMINI_API_KEY}
+      OLLAMA_HOST:       ${OLLAMA_HOST:-http://host.docker.internal:11434}
     ports:
       - "8000:8000"
     volumes:
       - ./logs:/app/logs
-      - ./data:/app/data
+      - ./config:/app/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   pg_data:

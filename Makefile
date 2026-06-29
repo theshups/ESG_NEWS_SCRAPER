@@ -2,7 +2,11 @@ frontend:
 	venv\\Scripts\\uvicorn.exe api.app:app --reload --port 8000
 
 scrape:
-	venv\\Scripts\\python.exe main.py --mode keyword
+	venv\\Scripts\\python.exe main.py
+	venv\\Scripts\\python.exe classify_live.py
+
+scrape-stream:
+	venv\\Scripts\\python.exe main.py --stream
 
 scrape-hf:
 	venv\\Scripts\\python.exe main.py --mode hf
@@ -43,3 +47,18 @@ clean:
 
 clean-old:
 	venv\\Scripts\\python.exe clean_old.py
+
+trend:
+	venv\\Scripts\\python.exe trend_synthesis.py
+
+trend-14:
+	venv\\Scripts\\python.exe trend_synthesis.py --days 14
+
+digest:
+	venv\\Scripts\\python.exe email_digest.py
+
+digest-send:
+	venv\\Scripts\\python.exe email_digest.py --send
+
+digest-week:
+	venv\\Scripts\\python.exe email_digest.py --days 7

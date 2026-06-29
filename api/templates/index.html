@@ -2,578 +2,502 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ESG Updates</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
 <style>
-  /* ── base ── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --green-deep:  #064e3b;
-    --green-mid:   #065f46;
-    --green-light: #d1fae5;
-    --green-text:  #065f46;
-    --blue-deep:   #1e3a8a;
-    --blue-light:  #dbeafe;
-    --blue-text:   #1e40af;
-    --purple-deep: #4c1d95;
-    --purple-light:#ede9fe;
-    --purple-text: #5b21b6;
-    --slate:       #0f172a;
-    --slate2:      #1e293b;
-    --slate3:      #334155;
-    --muted:       #64748b;
-    --muted2:      #94a3b8;
-    --line:        #e2e8f0;
-    --line2:       #f1f5f9;
-    --bg:          #f8fafc;
-  }
-  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--slate); }
-  .playfair { font-family: 'Playfair Display', Georgia, serif; }
-
-  /* ── ticker ── */
-  .ticker-track { display: inline-block; white-space: nowrap; animation: scroll 50s linear infinite; }
-  .ticker-wrap:hover .ticker-track { animation-play-state: paused; cursor: default; }
-  @keyframes scroll { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
-
-  /* ── card hover ── */
-  .article-card { transition: box-shadow .2s ease, transform .2s ease; }
-  .article-card:hover { box-shadow: 0 4px 24px rgba(15,23,42,.08); transform: translateY(-1px); }
-
-  /* ── summarize bar ── */
-  .summarize-bar {
-    width: 100%; display: flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 10px 0; margin-top: 14px;
-    border: 1.5px dashed #10b981; border-radius: 10px;
-    background: transparent; cursor: pointer; color: #065f46;
-    font-size: 12.5px; font-weight: 600; letter-spacing: .02em;
-    font-family: 'Inter', system-ui, sans-serif;
-    transition: all .2s ease;
-  }
-  .summarize-bar:hover { background: #ecfdf5; border-color: #065f46; }
-  .summarize-bar:active { transform: scale(.99); }
-
-  /* ── modal overlay ── */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 50;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(15,23,42,.55); backdrop-filter: blur(6px);
-    padding: 16px; opacity: 0; pointer-events: none;
-    transition: opacity .25s ease;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-  /* ── modal box ── */
-  .modal-box {
-    background: #fff; border-radius: 16px; max-width: 560px; width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,.2);
-    transform: translateY(12px) scale(.98);
-    transition: transform .25s ease;
-    overflow: hidden;
-  }
-  .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
-
-  /* ── spinner ── */
-  .spinner {
-    width: 32px; height: 32px; border-radius: 50%;
-    border: 3px solid #d1fae5; border-top-color: #065f46;
-    animation: spin .7s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── pill ── */
-  .filter-pill {
-    font-size: 11.5px; font-weight: 500; padding: 5px 16px;
-    border-radius: 999px; border: 1.5px solid var(--line);
-    background: transparent; color: var(--muted); cursor: pointer;
-    transition: all .15s; font-family: inherit;
-  }
-  .filter-pill:hover { border-color: var(--slate); color: var(--slate); }
-  .filter-pill.active { background: var(--slate); border-color: var(--slate); color: #fff; }
-
-  /* ── clamp ── */
-  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-
-  /* ── sidebar story hover ── */
-  .side-story { transition: background .15s; border-radius: 8px; }
-  .side-story:hover { background: var(--line2); }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#0f172a}
+.playfair{font-family:'Playfair Display',Georgia,serif}
+.ticker-wrap{overflow:hidden;white-space:nowrap;flex:1}
+.ticker-inner{display:inline-block;animation:tick 50s linear infinite}
+.ticker-wrap:hover .ticker-inner{animation-play-state:paused;cursor:default}
+@keyframes tick{0%{transform:translateX(100vw)}100%{transform:translateX(-100%)}}
+.card{transition:box-shadow .2s,transform .2s}
+.card:hover{box-shadow:0 6px 24px rgba(0,0,0,.1);transform:translateY(-1px)}
+.modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#fff;border-radius:16px;max-width:580px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);transform:translateY(12px) scale(.98);transition:transform .25s;overflow:hidden;max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
+.spinner{width:32px;height:32px;border-radius:50%;border:3px solid #d1fae5;border-top-color:#065f46;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pill{cursor:pointer;transition:all .15s;font-family:inherit;font-size:11px;padding:5px 14px;border-radius:999px;border:1.5px solid #e2e8f0;background:transparent;color:#64748b;font-weight:500}
+.pill:hover{border-color:#0f172a;color:#0f172a}
+.pill.active{background:#0f172a;border-color:#0f172a;color:#fff}
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════ TOP STRIP ═══════════════════════════════ -->
-<div style="background:var(--slate);color:#94a3b8;font-size:10px;padding:5px 24px;display:flex;justify-content:space-between;align-items:center;letter-spacing:.05em">
-  <span>ENVIRONMENTAL &nbsp;&bull;&nbsp; SOCIAL &nbsp;&bull;&nbsp; GOVERNANCE</span>
-  <span style="display:flex;align-items:center;gap:6px">
-    <span style="width:5px;height:5px;background:#4ade80;border-radius:50%;display:inline-block;animation:pulse 2s infinite"></span>
+<!-- top strip -->
+<div style="background:#0f172a;color:#64748b;font-size:10px;padding:5px 24px;display:flex;justify-content:space-between">
+  <span>CARBON MANAGEMENT &nbsp;&bull;&nbsp; SUSTAINABILITY INTELLIGENCE &nbsp;&bull;&nbsp; REGULATORY COMPLIANCE</span>
+  <span style="display:flex;align-items:center;gap:5px">
+    <span style="width:5px;height:5px;background:#4ade80;border-radius:50%;display:inline-block"></span>
     <span id="live-count">--</span> &nbsp;&bull;&nbsp; <span id="live-time">--</span>
   </span>
 </div>
 
-<!-- ═══════════════════════════════ MASTHEAD ════════════════════════════════ -->
-<header style="background:#fff;border-bottom:1px solid var(--line);padding:16px 24px;display:flex;justify-content:space-between;align-items:center">
+<!-- masthead -->
+<header style="background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;display:flex;justify-content:space-between;align-items:center">
   <div>
-    <h1 class="playfair" style="font-size:32px;color:var(--slate);letter-spacing:-.5px;line-height:1">ESG Updates</h1>
-    <p style="font-size:9.5px;color:var(--muted2);letter-spacing:.14em;text-transform:uppercase;margin-top:3px">Global Sustainability Intelligence</p>
+    <h1 class="playfair" style="font-size:30px;color:#0f172a;letter-spacing:-.5px;line-height:1">ESG Updates</h1>
+    <p style="font-size:9px;color:#94a3b8;letter-spacing:.14em;text-transform:uppercase;margin-top:2px">Sustainability &amp; Carbon Intelligence</p>
   </div>
-  <!-- desktop nav -->
-  <div style="display:flex;align-items:center;gap:24px">
-    <nav style="display:flex;gap:18px;font-size:12.5px;font-weight:500;color:var(--muted)">
-      <button onclick="applyFilter('Environmental')" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;font-weight:inherit;transition:color .15s" onmouseover="this.style.color='var(--green-mid)'" onmouseout="this.style.color='var(--muted)'">Environmental</button>
-      <button onclick="applyFilter('Social')" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;font-weight:inherit;transition:color .15s" onmouseover="this.style.color='var(--blue-deep)'" onmouseout="this.style.color='var(--muted)'">Social</button>
-      <button onclick="applyFilter('Governance')" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;font-weight:inherit;transition:color .15s" onmouseover="this.style.color='var(--purple-deep)'" onmouseout="this.style.color='var(--muted)'">Governance</button>
-    </nav>
+  <div style="display:flex;align-items:center;gap:14px">
     <div style="position:relative">
-      <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--muted2);pointer-events:none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-      <input id="search" oninput="handleSearch()" type="text" placeholder="Search..." style="font-size:12px;padding:7px 14px 7px 30px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--slate);outline:none;width:180px;font-family:inherit;transition:border-color .15s" onfocus="this.style.borderColor='var(--slate)'" onblur="this.style.borderColor='var(--line)'"/>
+      <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);width:12px;height:12px;color:#94a3b8;pointer-events:none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input id="search" oninput="doSearch()" type="text" placeholder="Search..." style="font-size:11px;padding:6px 12px 6px 28px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#0f172a;outline:none;width:160px;font-family:inherit"/>
     </div>
-    <!-- hamburger -->
-    <button onclick="toggleMenu()" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;flex-direction:column;gap:4px">
-      <span style="width:18px;height:1.5px;background:var(--slate);display:block"></span>
-      <span style="width:12px;height:1.5px;background:var(--slate);display:block"></span>
-      <span style="width:18px;height:1.5px;background:var(--slate);display:block"></span>
+    <button onclick="toggleMenu()" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:4px">
+      <span style="width:18px;height:1.5px;background:#0f172a;display:block"></span>
+      <span style="width:12px;height:1.5px;background:#0f172a;display:block"></span>
+      <span style="width:18px;height:1.5px;background:#0f172a;display:block"></span>
     </button>
   </div>
 </header>
 
 <!-- mobile menu -->
-<div id="mobile-menu" style="display:none;background:#fff;border-bottom:1px solid var(--line);padding:12px 24px;gap:12px">
-  <button onclick="applyFilter('All');toggleMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;font-size:13px;font-weight:500;color:var(--slate);cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line2);font-family:inherit">All Articles</button>
-  <button onclick="applyFilter('Environmental');toggleMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;font-size:13px;font-weight:500;color:var(--green-mid);cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line2);font-family:inherit">Environmental</button>
-  <button onclick="applyFilter('Social');toggleMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;font-size:13px;font-weight:500;color:var(--blue-deep);cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line2);font-family:inherit">Social</button>
-  <button onclick="applyFilter('Governance');toggleMenu()" style="display:block;width:100%;text-align:left;background:none;border:none;font-size:13px;font-weight:500;color:var(--purple-deep);cursor:pointer;padding:8px 0;font-family:inherit">Governance</button>
+<div id="mobile-menu" style="display:none;background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 24px;flex-direction:column;gap:6px">
+  <button onclick="setCat('All');toggleMenu()" style="background:none;border:none;font-size:13px;font-weight:500;color:#0f172a;cursor:pointer;text-align:left;font-family:inherit;padding:6px 0;border-bottom:1px solid #f1f5f9">All Articles</button>
+  <button onclick="setCat('Decarbonization');toggleMenu()" style="background:none;border:none;font-size:13px;font-weight:500;color:#065f46;cursor:pointer;text-align:left;font-family:inherit;padding:6px 0">Decarbonization</button>
+  <button onclick="setCat('Sustainability_Disclosure');toggleMenu()" style="background:none;border:none;font-size:13px;font-weight:500;color:#7c3aed;cursor:pointer;text-align:left;font-family:inherit;padding:6px 0">Disclosure</button>
 </div>
 
-<!-- ═════════════════════════════════ TICKER ════════════════════════════════ -->
-<div style="background:#fff;border-bottom:1px solid var(--line);height:34px;display:flex;align-items:center;padding:0 24px;gap:14px;overflow:hidden">
-  <span style="background:var(--slate);color:#fff;font-size:9px;font-weight:700;padding:3px 9px;border-radius:3px;letter-spacing:.1em;flex-shrink:0">LIVE</span>
-  <div class="ticker-wrap" style="flex:1;overflow:hidden">
-    <span class="ticker-track" style="font-size:11px;color:var(--muted)" id="ticker-text">Loading headlines...</span>
+<!-- ticker -->
+<div style="background:#fff;border-bottom:1px solid #e2e8f0;height:34px;display:flex;align-items:center;padding:0 24px;gap:14px;overflow:hidden">
+  <span style="background:#0f172a;color:#fff;font-size:9px;font-weight:700;padding:3px 9px;border-radius:3px;letter-spacing:.1em;flex-shrink:0">LIVE</span>
+  <div class="ticker-wrap"><span class="ticker-inner" style="font-size:11px;color:#64748b" id="ticker">Loading headlines...</span></div>
+</div>
+
+<!-- stats row -->
+<div style="background:#fff;border-bottom:1px solid #e2e8f0;display:grid;grid-template-columns:repeat(5,1fr)">
+  <div style="padding:10px 20px;border-right:1px solid #e2e8f0">
+    <div style="font-size:20px;font-weight:600;color:#0f172a" id="s-total">--</div>
+    <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.09em;margin-top:1px">Total</div>
+  </div>
+  <div style="padding:10px 20px;border-right:1px solid #e2e8f0">
+    <div style="font-size:20px;font-weight:600;color:#065f46" id="s-relevant">--</div>
+    <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.09em;margin-top:1px">Relevant</div>
+  </div>
+  <div style="padding:10px 20px;border-right:1px solid #e2e8f0">
+    <div style="font-size:20px;font-weight:600;color:#16a34a" id="s-positive">--</div>
+    <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.09em;margin-top:1px">Positive</div>
+  </div>
+  <div style="padding:10px 20px;border-right:1px solid #e2e8f0">
+    <div style="font-size:20px;font-weight:600;color:#dc2626" id="s-negative">--</div>
+    <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.09em;margin-top:1px">Negative</div>
+  </div>
+  <div style="padding:10px 20px">
+    <div style="font-size:20px;font-weight:600;color:#64748b" id="s-neutral">--</div>
+    <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.09em;margin-top:1px">Neutral</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════ STATS STRIP ══════════════════════════════ -->
-<div style="background:#fff;border-bottom:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr)">
-  <div style="padding:12px 24px;border-right:1px solid var(--line)">
-    <div style="font-size:22px;font-weight:600;color:var(--slate);line-height:1" id="s-total">--</div>
-    <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Total</div>
-  </div>
-  <div style="padding:12px 24px;border-right:1px solid var(--line)">
-    <div style="font-size:22px;font-weight:600;color:var(--green-mid);line-height:1" id="s-env">--</div>
-    <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Environmental</div>
-  </div>
-  <div style="padding:12px 24px;border-right:1px solid var(--line)">
-    <div style="font-size:22px;font-weight:600;color:var(--blue-deep);line-height:1" id="s-soc">--</div>
-    <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Social</div>
-  </div>
-  <div style="padding:12px 24px">
-    <div style="font-size:22px;font-weight:600;color:var(--purple-deep);line-height:1" id="s-gov">--</div>
-    <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Governance</div>
-  </div>
-</div>
-
-<!-- ════════════════════════════ HERO + SIDEBAR ═════════════════════════════ -->
-<div style="display:grid;grid-template-columns:1fr 300px;background:#fff;border-bottom:1px solid var(--line)">
-
-  <!-- hero article -->
-  <div style="padding:32px 28px;border-right:1px solid var(--line)">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-      <span id="hero-cat-pill" style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:999px;background:var(--green-light);color:var(--green-text)">Environmental</span>
-      <span style="font-size:10px;color:var(--muted2)" id="hero-src">--</span>
-      <span style="color:var(--line);font-size:10px">·</span>
-      <span style="font-size:10px;color:var(--muted2)" id="hero-date">--</span>
+<!-- hero + sidebar -->
+<div style="display:grid;grid-template-columns:1fr 300px;background:#fff;border-bottom:1px solid #e2e8f0">
+  <div style="padding:28px 28px;border-right:1px solid #e2e8f0">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span id="hero-sent-dot" style="width:7px;height:7px;border-radius:50%;background:#64748b;display:inline-block"></span>
+      <span id="hero-sent-txt" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#64748b">Neutral</span>
+      <span style="color:#e2e8f0">·</span>
+      <span id="hero-cat-badge" style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 9px;border-radius:999px;background:#d1fae5;color:#065f46">ESG</span>
     </div>
-    <h2 class="playfair" id="hero-title" style="font-size:28px;line-height:1.25;color:var(--slate);margin-bottom:14px;letter-spacing:-.2px">Loading featured article...</h2>
-    <p id="hero-body" style="font-size:13.5px;color:#475569;line-height:1.75;margin-bottom:20px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden"></p>
-    <a id="hero-link" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--green-deep);color:#fff;font-size:12px;font-weight:600;padding:10px 20px;border-radius:8px;text-decoration:none;letter-spacing:.03em;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    <h2 class="playfair" id="hero-title" style="font-size:26px;line-height:1.25;color:#0f172a;margin-bottom:12px">Loading featured article...</h2>
+    <p id="hero-body" style="font-size:13px;color:#475569;line-height:1.75;margin-bottom:10px" class="clamp3"></p>
+    <div id="hero-action" style="background:#f0fdf4;border-left:3px solid #065f46;border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:16px;font-size:12px;color:#065f46;font-weight:500;display:none"></div>
+    <a id="hero-link" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;background:#064e3b;color:#fff;font-size:11px;font-weight:600;padding:9px 18px;border-radius:7px;text-decoration:none">
       Read Full Article
-      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
     </a>
   </div>
-
-  <!-- sidebar top stories -->
-  <div style="padding:18px 20px;overflow-y:auto;max-height:340px" id="sidebar">
-    <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted2);padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px">Top Stories</p>
-    <div style="font-size:12px;color:var(--muted2)">Loading...</div>
+  <div style="padding:16px 18px;overflow-y:auto;max-height:320px" id="sidebar">
+    <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;padding-bottom:8px;border-bottom:1px solid #e2e8f0;margin-bottom:4px">Top Stories</p>
+    <div style="font-size:12px;color:#94a3b8">Loading...</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════ FILTER BAR ═══════════════════════════════ -->
-<div style="background:#fff;border-bottom:1px solid var(--line);padding:10px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-  <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);margin-right:4px">Filter</span>
-  <button class="filter-pill active" onclick="applyFilter('All')" data-cat="All">All</button>
-  <button class="filter-pill" onclick="applyFilter('Environmental')" data-cat="Environmental">Environmental</button>
-  <button class="filter-pill" onclick="applyFilter('Social')" data-cat="Social">Social</button>
-  <button class="filter-pill" onclick="applyFilter('Governance')" data-cat="Governance">Governance</button>
-  <button class="filter-pill" onclick="applyFilter('Mixed')" data-cat="Mixed">Mixed</button>
-  <span style="margin-left:auto;font-size:10.5px;color:var(--muted2)" id="count-label"></span>
+<!-- filter bar -->
+<div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 24px;overflow-x:auto">
+  <div style="display:flex;align-items:center;gap:6px;min-width:max-content;flex-wrap:wrap">
+    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-right:4px">CATEGORY</span>
+    <button class="pill active" onclick="setCat('All')" data-cat="All">All</button>
+    <button class="pill" onclick="setCat('Decarbonization')" data-cat="Decarbonization">Decarbonization</button>
+    <button class="pill" onclick="setCat('Carbon_Accounting')" data-cat="Carbon_Accounting">Carbon Accounting</button>
+    <button class="pill" onclick="setCat('Sustainability_Disclosure')" data-cat="Sustainability_Disclosure">Disclosure</button>
+    <button class="pill" onclick="setCat('CBAM')" data-cat="CBAM">CBAM</button>
+    <button class="pill" onclick="setCat('BRSR')" data-cat="BRSR">BRSR</button>
+    <button class="pill" onclick="setCat('Environmental_Regulation')" data-cat="Environmental_Regulation">Regulation</button>
+    <button class="pill" onclick="setCat('Supply_Chain_Due_Diligence')" data-cat="Supply_Chain_Due_Diligence">Supply Chain</button>
+    <button class="pill" onclick="setCat('Governance_Compliance')" data-cat="Governance_Compliance">Governance</button>
+    <button class="pill" onclick="setCat('Carbon_Markets')" data-cat="Carbon_Markets">Carbon Markets</button>
+    <button class="pill" onclick="setCat('Material_ESG_Risk')" data-cat="Material_ESG_Risk">ESG Risk</button>
+    
+    <span style="width:1px;height:20px;background:#e2e8f0;display:inline-block;margin:0 4px"></span>
+    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-right:4px">SENTIMENT</span>
+    <button class="pill" onclick="setSent('positive')" data-sent="positive" style="border-color:#bbf7d0;color:#16a34a">Positive</button>
+    <button class="pill" onclick="setSent('negative')" data-sent="negative" style="border-color:#fecaca;color:#dc2626">Negative</button>
+    <button class="pill" onclick="setSent('neutral')" data-sent="neutral" style="border-color:#e2e8f0;color:#64748b">Neutral</button>
+    <span style="width:1px;height:20px;background:#e2e8f0;display:inline-block;margin:0 4px"></span>
+    <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b;cursor:pointer">
+      <input type="checkbox" id="show-irrelevant" onchange="renderGrid()"/>
+      Show irrelevant
+    </label>
+    <span style="font-size:10px;color:#94a3b8;margin-left:4px" id="count-label"></span>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════ ARTICLE GRID ════════════════════════════ -->
-<main style="max-width:1280px;margin:0 auto;padding:24px 24px 64px">
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px" id="grid">
-    <!-- skeleton -->
-    <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid var(--line)"><div style="height:12px;background:var(--line2);border-radius:4px;width:30%;margin-bottom:14px"></div><div style="height:16px;background:var(--line2);border-radius:4px;margin-bottom:8px"></div><div style="height:16px;background:var(--line2);border-radius:4px;width:80%;margin-bottom:8px"></div><div style="height:12px;background:var(--line2);border-radius:4px;width:50%;margin-top:16px"></div></div>
-    <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid var(--line)"><div style="height:12px;background:var(--line2);border-radius:4px;width:30%;margin-bottom:14px"></div><div style="height:16px;background:var(--line2);border-radius:4px;margin-bottom:8px"></div><div style="height:16px;background:var(--line2);border-radius:4px;width:80%;margin-bottom:8px"></div><div style="height:12px;background:var(--line2);border-radius:4px;width:50%;margin-top:16px"></div></div>
-    <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid var(--line)"><div style="height:12px;background:var(--line2);border-radius:4px;width:30%;margin-bottom:14px"></div><div style="height:16px;background:var(--line2);border-radius:4px;margin-bottom:8px"></div><div style="height:16px;background:var(--line2);border-radius:4px;width:80%;margin-bottom:8px"></div><div style="height:12px;background:var(--line2);border-radius:4px;width:50%;margin-top:16px"></div></div>
+<!-- article grid -->
+<main style="max-width:1280px;margin:0 auto;padding:20px 24px 60px">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px" id="grid">
+    <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:18px"><div style="height:10px;background:#f1f5f9;border-radius:4px;width:30%;margin-bottom:12px"></div><div style="height:14px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:14px;background:#f1f5f9;border-radius:4px;width:80%"></div></div>
+    <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:18px"><div style="height:10px;background:#f1f5f9;border-radius:4px;width:30%;margin-bottom:12px"></div><div style="height:14px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:14px;background:#f1f5f9;border-radius:4px;width:80%"></div></div>
+    <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:18px"><div style="height:10px;background:#f1f5f9;border-radius:4px;width:30%;margin-bottom:12px"></div><div style="height:14px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:14px;background:#f1f5f9;border-radius:4px;width:80%"></div></div>
   </div>
 </main>
 
-<!-- ════════════════════════════ AI SUMMARY MODAL ═══════════════════════════ -->
-<div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
-  <div class="modal-box" id="modal-box">
-
-    <!-- modal header -->
-    <div style="background:var(--green-deep);padding:18px 22px;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+<!-- modal -->
+<div class="modal-overlay" id="modal" onclick="handleOverlay(event)">
+  <div class="modal-box">
+    <div style="background:#064e3b;padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;background:rgba(255,255,255,.15);border-radius:7px;display:flex;align-items:center;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         </div>
         <div>
-          <p style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.03em">AI Summary</p>
-          <p style="font-size:9.5px;color:rgba(255,255,255,.65);margin-top:1px">Local model analysis</p>
+          <p style="font-size:12px;font-weight:700;color:#fff">AI Summary</p>
+          <p style="font-size:9.5px;color:rgba(255,255,255,.6);margin-top:1px">Local model analysis</p>
         </div>
       </div>
-      <!-- close button -->
-      <button onclick="closeModal()" style="background:rgba(255,255,255,.1);border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
-        <svg width="14" height="14" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      <button onclick="closeModal()" style="background:rgba(255,255,255,.1);border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center">
+        <svg width="13" height="13" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-
-    <!-- article title inside modal -->
-    <div style="padding:16px 22px 0">
-      <p class="playfair" id="modal-article-title" style="font-size:15px;font-weight:600;color:var(--slate);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"></p>
+    <div style="padding:14px 20px 0">
+      <p class="playfair" id="modal-title" style="font-size:14px;font-weight:600;color:#0f172a;line-height:1.4" class="clamp2"></p>
     </div>
-
-    <!-- loading state -->
-    <div id="modal-loading" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;gap:14px">
+    <div id="modal-loading" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;gap:12px">
       <div class="spinner"></div>
-      <p style="font-size:12px;color:var(--muted);text-align:center">Local AI is reading the article<br/>and generating your summary...</p>
+      <p style="font-size:12px;color:#64748b">Generating summary...</p>
     </div>
-
-    <!-- summary content -->
-    <div id="modal-content" style="padding:16px 22px 20px;display:none">
-
-      <!-- overview section -->
-      <div style="background:var(--line2);border-radius:10px;padding:14px 16px;margin-bottom:12px;border-left:3px solid var(--green-mid)">
-        <p style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green-mid);margin-bottom:7px">Overview</p>
-        <p id="modal-overview" style="font-size:13px;color:#334155;line-height:1.7"></p>
+    <div id="modal-body" style="padding:14px 20px 18px;display:none">
+      <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;margin-bottom:10px;border-left:3px solid #065f46">
+        <p style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#065f46;margin-bottom:6px">Overview</p>
+        <p id="modal-overview" style="font-size:12.5px;color:#334155;line-height:1.7"></p>
       </div>
-
-      <!-- key points -->
-      <div style="background:var(--line2);border-radius:10px;padding:14px 16px;margin-bottom:12px">
-        <p style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px">Key Points</p>
-        <ul id="modal-points" style="list-style:none;display:flex;flex-direction:column;gap:7px"></ul>
+      <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <p style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:8px">Key Points</p>
+        <ul id="modal-points" style="list-style:none;display:flex;flex-direction:column;gap:6px"></ul>
       </div>
-
-      <!-- esg impact -->
-      <div style="background:#f0fdf4;border-radius:10px;padding:14px 16px;margin-bottom:18px;border:1px solid #bbf7d0">
-        <p style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green-mid);margin-bottom:7px">ESG Impact</p>
-        <p id="modal-impact" style="font-size:13px;color:#065f46;line-height:1.7"></p>
+      <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;margin-bottom:16px;border:1px solid #bbf7d0">
+        <p style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#065f46;margin-bottom:6px">ESG Impact</p>
+        <p id="modal-impact" style="font-size:12.5px;color:#065f46;line-height:1.7"></p>
       </div>
-
-      <!-- CTA -->
-      <a id="modal-read-btn" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:var(--green-deep);color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:.03em;transition:opacity .15s" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+      <a id="modal-read-btn" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#064e3b;color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none">
         Read Full Article
-        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6m0 0v6m0-6L10 14"/></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6m0 0v6m0-6L10 14"/></svg>
       </a>
-
-      <p style="font-size:10px;color:var(--muted2);text-align:center;margin-top:10px">Generated by local AI model &nbsp;·&nbsp; Always verify with source</p>
+      <p style="font-size:10px;color:#94a3b8;text-align:center;margin-top:8px">Generated by local AI model</p>
     </div>
-
-    <!-- error state -->
-    <div id="modal-error" style="display:none;padding:28px 22px;text-align:center">
-      <p style="font-size:13px;font-weight:500;color:var(--slate);margin-bottom:6px">Summary not available</p>
-      <p id="modal-error-msg" style="font-size:12px;color:var(--muted);margin-bottom:16px">The model may still be loading. Please try again in a moment.</p>
-      <button onclick="closeModal()" style="font-size:12px;font-weight:600;padding:8px 20px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--slate);cursor:pointer;font-family:inherit">Close</button>
+    <div id="modal-error" style="display:none;padding:24px 20px;text-align:center">
+      <p style="font-size:13px;font-weight:500;color:#0f172a;margin-bottom:6px">Summary unavailable</p>
+      <p id="modal-err-msg" style="font-size:12px;color:#64748b;margin-bottom:14px"></p>
+      <button onclick="closeModal()" style="font-size:12px;padding:7px 18px;border-radius:7px;border:1px solid #e2e8f0;background:transparent;color:#0f172a;cursor:pointer;font-family:inherit">Close</button>
     </div>
-
   </div>
 </div>
 
-<!-- ════════════════════════════════ FOOTER ═════════════════════════════════ -->
-<footer style="background:var(--slate);color:#64748b;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;font-size:10.5px">
+<!-- footer -->
+<footer style="background:#0f172a;color:#475569;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;font-size:10px">
   <div>
-    <div class="playfair" style="font-size:18px;color:#f1f5f9;margin-bottom:3px">ESG Updates</div>
-    <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">Global Sustainability Intelligence</div>
+    <div class="playfair" style="font-size:17px;color:#f1f5f9;margin-bottom:2px">ESG Updates</div>
+    <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">Sustainability &amp; Carbon Intelligence</div>
   </div>
-  <div style="display:flex;align-items:center;gap:6px">
+  <div style="display:flex;align-items:center;gap:5px">
     <span style="width:5px;height:5px;background:#4ade80;border-radius:50%;display:inline-block"></span>
     Auto-refreshes every 5 minutes
   </div>
   <span id="refresh-timer">Next refresh: 5:00</span>
 </footer>
 
-<!-- ════════════════════════════════ SCRIPT ═════════════════════════════════ -->
 <script>
-/* ── state ── */
-var API    = "";
-var arts   = [];
-var active = "All";
-var query  = "";
-var secs   = 300;
-var currentUrl = "#";
+var API   = "";
+var arts  = [];
+var cat   = "All";
+var sent  = "All";
+var query = "";
+var secs  = 300;
 
-/* ── helpers ── */
+var CAT_STYLE = {
+  "BRSR":                      {bg:"#fff7ed",tx:"#ea580c",bar:"#f97316"},
+  "CBAM":                      {bg:"#eff6ff",tx:"#1d4ed8",bar:"#3b82f6"},
+  "Carbon_Accounting":         {bg:"#f0fdfa",tx:"#0d9488",bar:"#14b8a6"},
+  "Decarbonization":           {bg:"#f0fdf4",tx:"#065f46",bar:"#10b981"},
+  "Sustainability_Disclosure": {bg:"#faf5ff",tx:"#6d28d9",bar:"#8b5cf6"},
+  "Environmental_Regulation":  {bg:"#fff1f2",tx:"#be123c",bar:"#f43f5e"},
+  "Supply_Chain_Due_Diligence":{bg:"#eef2ff",tx:"#3730a3",bar:"#6366f1"},
+  "Governance_Compliance":     {bg:"#f5f3ff",tx:"#5b21b6",bar:"#7c3aed"},
+  "Material_ESG_Risk":         {bg:"#fff1f2",tx:"#9f1239",bar:"#e11d48"},
+  "Carbon_Markets":            {bg:"#ecfdf5",tx:"#047857",bar:"#059669"},
+  "Irrelevant":                {bg:"#f8fafc",tx:"#64748b",bar:"#94a3b8"},
+};
+
+var SENT_STYLE = {
+  "positive": {color:"#16a34a", bg:"#f0fdf4", icon:"+"},
+  "negative": {color:"#dc2626", bg:"#fef2f2", icon:"-"},
+  "neutral":  {color:"#64748b", bg:"#f8fafc", icon:"~"},
+};
+
+function cs(c){ return CAT_STYLE[c] || CAT_STYLE["Irrelevant"]; }
+function ss(s){ return SENT_STYLE[s] || SENT_STYLE["neutral"]; }
 function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function fmt(iso){ try{ return new Date(iso).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }catch(e){ return ""; } }
+function catLabel(c){ return (c||"").replace(/_/g," "); }
 
-function catStyle(c){
-  if(c==="Environmental") return {bg:"var(--green-light)",tx:"var(--green-text)",bar:"#10b981"};
-  if(c==="Social")        return {bg:"var(--blue-light)", tx:"var(--blue-text)", bar:"#3b82f6"};
-  if(c==="Governance")    return {bg:"var(--purple-light)",tx:"var(--purple-text)",bar:"#8b5cf6"};
-  return {bg:"#f1f5f9",tx:"#475569",bar:"#94a3b8"};
-}
-
-/* ── fetch data ── */
-function loadArticles(){
-  var url = active && active!=="All"
-    ? API+"/api/articles?category="+encodeURIComponent(active)+"&limit=60"
-    : API+"/api/articles?limit=60";
-  fetch(url)
+function load(){
+  fetch(API + "/api/articles?limit=500&relevant_only=false")
     .then(function(r){ return r.json(); })
     .then(function(d){
       arts = d;
-      renderHero(); renderSidebar(); renderTicker(); renderGrid();
-      document.getElementById("live-count").textContent = d.length+" articles";
-      document.getElementById("live-time").textContent  = "Updated "+new Date().toLocaleTimeString();
+      renderHero();
+      renderSidebar();
+      renderTicker();
+      renderGrid();
+      document.getElementById("live-count").textContent = d.length + " articles";
+      document.getElementById("live-time").textContent  = "Updated " + new Date().toLocaleTimeString();
     })
     .catch(function(){
       document.getElementById("grid").innerHTML =
-        "<div style='grid-column:1/-1;text-align:center;padding:60px 0;color:var(--muted)'>"
-        +"<p style='font-size:15px;font-weight:500;margin-bottom:8px'>Pipeline not connected</p>"
-        +"<p style='font-size:12px'>Run python main.py then uvicorn api.app:app --port 8000</p></div>";
+        "<div style='grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8'>"
+        + "<p style='font-size:14px;font-weight:500;margin-bottom:8px'>Pipeline not connected</p>"
+        + "<p style='font-size:12px'>Run make scrape then make frontend</p></div>";
     });
 }
 
 function loadStats(){
-  fetch(API+"/api/stats")
+  fetch(API + "/api/stats")
     .then(function(r){ return r.json(); })
     .then(function(d){
-      var c=d.by_category||{};
-      document.getElementById("s-total").textContent = d.total||0;
-      document.getElementById("s-env").textContent   = c["Environmental"]||0;
-      document.getElementById("s-soc").textContent   = c["Social"]||0;
-      document.getElementById("s-gov").textContent   = c["Governance"]||0;
+      document.getElementById("s-total").textContent    = d.total    || 0;
+      document.getElementById("s-relevant").textContent = d.relevant || 0;
+      var sent = d.by_sentiment || {};
+      document.getElementById("s-positive").textContent = sent["positive"] || 0;
+      document.getElementById("s-negative").textContent = sent["negative"] || 0;
+      document.getElementById("s-neutral").textContent  = sent["neutral"]  || 0;
     });
 }
 
-/* ── hero ── */
 function renderHero(){
-  if(!arts.length) return;
-  var a=arts[0]; var s=catStyle(a.category);
-  document.getElementById("hero-title").textContent = a.title||"";
-  document.getElementById("hero-body").textContent  = (a.body_text||"").slice(0,300)+(a.body_text&&a.body_text.length>300?"...":"");
-  document.getElementById("hero-src").textContent   = a.source||"";
-  document.getElementById("hero-date").textContent  = fmt(a.date);
-  document.getElementById("hero-link").href         = a.url||"#";
-  var pill=document.getElementById("hero-cat-pill");
-  pill.textContent=a.category||"ESG"; pill.style.background=s.bg; pill.style.color=s.tx;
+  var pool = arts.filter(function(a){ return a.relevant; });
+  if (!pool.length) pool = arts;
+  if (!pool.length) return;
+  var a = pool[0];
+  var c = cs(a.category); var s = ss(a.sentiment);
+  document.getElementById("hero-title").textContent = a.title || "";
+  document.getElementById("hero-body").textContent  = (a.body_text||"").slice(0,280) + "...";
+  document.getElementById("hero-link").href         = a.url || "#";
+  var dot = document.getElementById("hero-sent-dot");
+  var txt = document.getElementById("hero-sent-txt");
+  dot.style.background = s.color;
+  txt.textContent = (a.sentiment || "neutral").charAt(0).toUpperCase() + (a.sentiment||"neutral").slice(1);
+  txt.style.color = s.color;
+  var badge = document.getElementById("hero-cat-badge");
+  badge.textContent = catLabel(a.category||"ESG");
+  badge.style.background = c.bg; badge.style.color = c.tx;
+  var actionEl = document.getElementById("hero-action");
+  if (a.action && a.action !== "No action."){
+    actionEl.textContent = "Action: " + a.action;
+    actionEl.style.display = "block";
+  } else {
+    actionEl.style.display = "none";
+  }
 }
 
-/* ── sidebar ── */
 function renderSidebar(){
-  var el=document.getElementById("sidebar");
-  el.innerHTML="<p style='font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted2);padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px'>Top Stories</p>"
-    +arts.slice(1,6).map(function(a){
-      var s=catStyle(a.category);
-      return "<a href='"+esc(a.url)+"' target='_blank' rel='noopener' style='text-decoration:none;display:block'>"
-        +"<div class='side-story' style='padding:10px 6px;border-bottom:1px solid var(--line2)'>"
-        +"<div style='display:flex;align-items:center;gap:6px;margin-bottom:5px'>"
-        +"<span style='width:5px;height:5px;border-radius:50%;background:"+s.bar+";flex-shrink:0'></span>"
-        +"<span style='font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:"+s.tx+"'>"+esc(a.category)+"</span>"
-        +"<span style='font-size:9px;color:var(--muted2);margin-left:auto'>"+esc(a.source)+"</span>"
-        +"</div>"
-        +"<p style='font-size:12.5px;font-weight:500;color:var(--slate);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden'>"+esc(a.title)+"</p>"
-        +"</div></a>";
-    }).join("");
+  var el   = document.getElementById("sidebar");
+  var pool = arts.filter(function(a){ return a.relevant; }).slice(0,6);
+  if (!pool.length) pool = arts.slice(0,6);
+  el.innerHTML = "<p style='font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;padding-bottom:8px;border-bottom:1px solid #e2e8f0;margin-bottom:4px'>Top Stories</p>"
+    + pool.map(function(a){
+        var c = cs(a.category); var s = ss(a.sentiment);
+        return "<a href='" + esc(a.url) + "' target='_blank' rel='noopener' style='display:block;text-decoration:none'>"
+          + "<div style='padding:9px 4px;border-bottom:1px solid #f1f5f9'>"
+          + "<div style='display:flex;align-items:center;gap:5px;margin-bottom:4px'>"
+          + "<span style='width:5px;height:5px;border-radius:50%;background:" + s.color + ";flex-shrink:0'></span>"
+          + "<span style='font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:" + c.tx + "'>" + catLabel(a.category) + "</span>"
+          + "<span style='font-size:9px;color:#94a3b8;margin-left:auto'>" + esc(a.source) + "</span>"
+          + "</div>"
+          + "<p style='font-size:12px;font-weight:500;color:#0f172a;line-height:1.4' class='clamp2'>" + esc(a.title) + "</p>"
+          + "</div></a>";
+      }).join("");
 }
 
-/* ── ticker ── */
 function renderTicker(){
-  document.getElementById("ticker-text").textContent =
-    arts.slice(0,15).map(function(a){ return (a.category?"["+a.category+"] ":"")+(a.title||""); }).join("   \u2022   ");
+  var pool = arts.filter(function(a){ return a.relevant; });
+  if (!pool.length) pool = arts;
+  document.getElementById("ticker").textContent =
+    pool.slice(0,20).map(function(a){
+      var icon = ss(a.sentiment).icon;
+      return "[" + icon + "] " + (a.category ? "[" + catLabel(a.category) + "] " : "") + (a.title||"");
+    }).join("   \u2022   ");
 }
 
-/* ── article grid ── */
 function renderGrid(){
-  var q=query.toLowerCase();
-  var shown=arts.filter(function(a){
-    return (active==="All"||a.category===active)
-      && (!q||(a.title||"").toLowerCase().includes(q)||(a.source||"").toLowerCase().includes(q));
+  var showIrrel = document.getElementById("show-irrelevant").checked;
+  var q = query.toLowerCase();
+
+  var shown = arts.filter(function(a){
+    if (a.category === "Irrelevant") return false;
+    if (!a.relevant) return false;
+    if (cat !== "All" && a.category !== cat) return false;
+    if (sent !== "All" && a.sentiment !== sent) return false;
+    if (q && !(a.title||"").toLowerCase().includes(q) && !(a.source||"").toLowerCase().includes(q)) return false;
+    return true;
   });
 
-  document.getElementById("count-label").textContent=shown.length+" articles";
+  document.getElementById("count-label").textContent = shown.length + " shown";
 
-  var g=document.getElementById("grid");
-  if(!shown.length){
-    g.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)'><p style='font-size:14px;font-weight:500'>No articles match</p></div>";
+  var g = document.getElementById("grid");
+  if (!shown.length){
+    g.innerHTML = "<div style='grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8'>"
+      + "<p style='font-size:14px;font-weight:500'>No articles match</p>"
+      + "<p style='font-size:12px;margin-top:6px'>Try a different filter or run make scrape</p></div>";
     return;
   }
 
-  g.innerHTML=shown.map(function(a,i){
-    var s=catStyle(a.category||"Mixed");
-    var cat=a.category||"Mixed";
-    var conf=a.confidence?Math.round(a.confidence*100)+"%":"";
+  g.innerHTML = shown.map(function(a){
+    var c   = cs(a.category || "Irrelevant");
+    var s   = ss(a.sentiment || "neutral");
+    var cat_label = catLabel(a.category || "Irrelevant");
 
-    return "<article class='article-card' style='background:#fff;border-radius:12px;border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column'>"
-      /* top accent bar */
-      +"<div style='height:3px;background:"+s.bar+";width:100%'></div>"
-      /* body */
-      +"<div style='padding:18px;flex:1;display:flex;flex-direction:column'>"
-      /* meta row */
-      +"<div style='display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap'>"
-      +"<span style='font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 9px;border-radius:999px;background:"+s.bg+";color:"+s.tx+"'>"+esc(cat)+"</span>"
-      +(conf?"<span style='font-size:9.5px;color:var(--muted2)'>"+conf+"</span>":"")
-      +"<span style='font-size:9.5px;color:var(--muted2);margin-left:auto'>"+fmt(a.date)+"</span>"
-      +"</div>"
-      /* title */
-      +"<h3 class='playfair' style='font-size:15px;font-weight:700;color:var(--slate);line-height:1.35;margin-bottom:8px;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden'>"
-      +"<a href='"+esc(a.url)+"' target='_blank' rel='noopener' style='color:inherit;text-decoration:none'>"+esc(a.title)+"</a></h3>"
-      /* excerpt */
-      +(a.body_text?"<p style='font-size:12px;color:#64748b;line-height:1.65;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden'>"+esc(a.body_text.slice(0,180))+"</p>":"")
-      /* source + author */
-      +"<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:14px'>"
-      +"<span style='font-size:10.5px;font-weight:500;color:var(--muted)'>"+esc(a.source)+"</span>"
-      +(a.author?"<span style='font-size:10px;color:var(--muted2)'>"+esc(a.author)+"</span>":"")
-      +"</div>"
-      /* ── SUMMARIZE BAR ── */
-      +"<button class='summarize-bar' onclick=\"openModal('"+a.article_id+"','"+esc(a.title).replace(/'/g,"\\'")+"','"+esc(a.url).replace(/'/g,"\\'")+"')\">"
-      +""
-      +"Summarize with Local AI"
-      +"</button>"
-      +"</div></article>";
+    var sentBadge = "<span style='display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;padding:2px 7px;border-radius:999px;background:" + s.bg + ";color:" + s.color + "'>"
+      + s.icon + " " + (a.sentiment||"neutral") + "</span>";
+
+    var actionHtml = (a.action && a.action !== "No action.")
+      ? "<div style='background:#f0fdf4;border-left:2.5px solid #065f46;border-radius:0 5px 5px 0;padding:6px 10px;margin-bottom:10px;font-size:11px;color:#065f46;font-weight:500'>"
+        + "<span style='color:#94a3b8;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:2px'>Action</span>"
+        + esc(a.action) + "</div>"
+      : "";
+
+    var tagsHtml = a.tags
+      ? "<div style='display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px'>"
+        + (a.tags||"").split(",").filter(function(t){ return t.trim(); }).slice(0,4).map(function(t){
+            return "<span style='font-size:9.5px;padding:2px 7px;border-radius:4px;background:#f1f5f9;color:#64748b'>" + esc(t.trim()) + "</span>";
+          }).join("") + "</div>"
+      : "";
+
+    return "<article class='card' style='background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;display:flex;flex-direction:column'>"
+      + "<div style='height:3px;background:" + c.bar + ";width:100%'></div>"
+      + "<div style='padding:16px;flex:1;display:flex;flex-direction:column'>"
+      + "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px;flex-wrap:wrap'>"
+      + "<span style='font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 9px;border-radius:999px;background:" + c.bg + ";color:" + c.tx + "'>" + cat_label + "</span>"
+      + sentBadge
+      + "</div>"
+      + "<h3 class='playfair' style='font-size:14.5px;font-weight:700;color:#0f172a;line-height:1.35;margin-bottom:6px;flex:1' class='clamp3'>"
+      + "<a href='" + esc(a.url) + "' target='_blank' rel='noopener' style='color:inherit;text-decoration:none'>" + esc(a.title) + "</a></h3>"
+      + (a.body_text ? "<p style='font-size:11.5px;color:#64748b;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden'>" + esc(a.body_text.slice(0,180)) + "</p>" : "")
+      + tagsHtml
+      + actionHtml
+      + "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-top:8px;border-top:1px solid #f1f5f9'>"
+      + "<span style='font-size:10.5px;font-weight:500;color:#64748b'>" + esc(a.source) + "</span>"
+      + "<span style='font-size:10px;color:#94a3b8'>" + fmt(a.date) + "</span>"
+      + "</div>"
+      + "<button onclick=\"openModal('" + a.article_id + "','" + esc(a.title).replace(/'/g,"\\'") + "','" + esc(a.url).replace(/'/g,"\\'") + "')\" "
+      + "style='width:100%;padding:9px;border-radius:9px;border:1.5px dashed #10b981;background:transparent;color:#065f46;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s' "
+      + "onmouseover=\"this.style.background='#f0fdf4'\" onmouseout=\"this.style.background='transparent'\">"
+      + "Summarize with Local AI</button>"
+      + "</div></article>";
   }).join("");
 }
 
-/* ── modal ── */
-function openModal(articleId, title, url){
-  currentUrl = url || "#";
-
-  /* set article title and read btn */
-  document.getElementById("modal-article-title").textContent = title;
-  document.getElementById("modal-read-btn").href = url || "#";
-
-  /* reset states */
-  document.getElementById("modal-loading").style.display = "none";
-  document.getElementById("modal-content").style.display = "none";
-  document.getElementById("modal-error").style.display   = "none";
-
-  /* open overlay */
+function openModal(id, title, url){
   document.getElementById("modal").classList.add("open");
+  document.getElementById("modal-title").textContent  = title;
+  document.getElementById("modal-read-btn").href      = url;
+  document.getElementById("modal-loading").style.display = "none";
+  document.getElementById("modal-body").style.display    = "none";
+  document.getElementById("modal-error").style.display   = "none";
   document.body.style.overflow = "hidden";
-
-  /* check cache first */
-  var art = arts.find(function(a){ return a.article_id === articleId; });
-  if(art && art.gemini_summary){
-    parseSummary(art.gemini_summary);
-    return;
-  }
-
-  /* show spinner */
+  var art = arts.find(function(a){ return a.article_id === id; });
+  if (art && art.gemini_summary){ parseSummary(art.gemini_summary); return; }
   document.getElementById("modal-loading").style.display = "flex";
-
-  /* call API */
-  fetch(API+"/api/summary/"+articleId)
+  fetch(API + "/api/summary/" + id)
     .then(function(r){ return r.json(); })
     .then(function(d){
       document.getElementById("modal-loading").style.display = "none";
-
-      if(d.summary && d.summary.trim()){
-        if(art) art.gemini_summary = d.summary;
+      if (d.summary && d.summary.trim()){
+        if (art) art.gemini_summary = d.summary;
         parseSummary(d.summary);
       } else {
-        var msg = d.message || (d.ready===false
-          ? "The local AI model is still loading. Please try again in 10-15 seconds."
-          : "Could not generate a summary for this article.");
-        showError(msg);
+        showErr(d.message || "Could not generate summary.");
       }
     })
-    .catch(function(e){
-      document.getElementById("modal-loading").style.display = "none";
-      showError("Connection error. Make sure uvicorn is running on port 8000.");
-    });
+    .catch(function(){ showErr("Connection failed. Make sure uvicorn is running."); });
 }
 
 function parseSummary(text){
-  var overviewMatch = text.match(/OVERVIEW\s*([\s\S]*?)(?=KEY POINTS|ESG IMPACT|$)/i);
-  var pointsMatch   = text.match(/KEY POINTS\s*([\s\S]*?)(?=ESG IMPACT|$)/i);
-  var impactMatch   = text.match(/ESG IMPACT\s*([\s\S]*?)$/i);
-
-  var overview = overviewMatch ? overviewMatch[1].trim() : text.split("\n\n")[0] || text;
-  var impact   = impactMatch   ? impactMatch[1].trim()   : "";
-  var pointsHtml = "";
-
-  if(pointsMatch){
-    var lines = pointsMatch[1].trim().split("\n").filter(function(l){ return l.trim(); });
-    pointsHtml = lines.map(function(l){
-      var txt = l.replace(/^[-*\u2022]\s*/, "").trim();
-      return "<li style='display:flex;gap:8px;font-size:12.5px;color:#334155;line-height:1.6'>"
-        +"<span style='color:var(--green-mid);font-weight:700;flex-shrink:0;margin-top:1px'>+</span>"
-        +"<span>"+esc(txt)+"</span></li>";
+  var om = text.match(/OVERVIEW\s*([\s\S]*?)(?=KEY POINTS|ESG IMPACT|$)/i);
+  var pm = text.match(/KEY POINTS\s*([\s\S]*?)(?=ESG IMPACT|$)/i);
+  var im = text.match(/ESG IMPACT\s*([\s\S]*?)$/i);
+  document.getElementById("modal-overview").textContent = om ? om[1].trim() : text.split("\n\n")[0] || text;
+  document.getElementById("modal-impact").textContent   = im ? im[1].trim() : "";
+  var pts = document.getElementById("modal-points");
+  if (pm){
+    var lines = pm[1].trim().split("\n").filter(function(l){ return l.trim(); });
+    pts.innerHTML = lines.map(function(l){
+      return "<li style='display:flex;gap:7px;font-size:11.5px;color:#334155;line-height:1.6'>"
+        + "<span style='color:#065f46;font-weight:700;flex-shrink:0'>+</span>"
+        + "<span>" + esc(l.replace(/^[-*\u2022]\s*/,"").trim()) + "</span></li>";
     }).join("");
+  } else {
+    pts.innerHTML = "<li style='font-size:11px;color:#94a3b8'>See overview for details.</li>";
   }
-
-  document.getElementById("modal-overview").textContent  = overview || "See the full article for details.";
-  document.getElementById("modal-points").innerHTML      = pointsHtml || "<li style='font-size:12px;color:var(--muted)'>See overview for key information.</li>";
-  document.getElementById("modal-impact").textContent    = impact || "This story has significant implications for ESG strategy and sustainability reporting.";
-  document.getElementById("modal-content").style.display = "block";
+  document.getElementById("modal-body").style.display = "block";
 }
 
-function showError(msg){
-  document.getElementById("modal-error-msg").textContent = msg;
-  document.getElementById("modal-error").style.display   = "block";
+function showErr(msg){
+  document.getElementById("modal-err-msg").textContent = msg;
+  document.getElementById("modal-error").style.display = "block";
 }
 
-function closeModal(){
-  document.getElementById("modal").classList.remove("open");
-  document.body.style.overflow = "";
-}
-
-function handleOverlayClick(e){
-  if(e.target === document.getElementById("modal")) closeModal();
-}
-
+function closeModal(){ document.getElementById("modal").classList.remove("open"); document.body.style.overflow = ""; }
+function handleOverlay(e){ if(e.target===document.getElementById("modal")) closeModal(); }
 document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModal(); });
 
-/* ── filters ── */
-function applyFilter(cat){
-  active = cat;
-  document.querySelectorAll(".filter-pill").forEach(function(b){
-    var on = b.getAttribute("data-cat")===cat;
-    b.classList.toggle("active", on);
-  });
-  if(arts.length) renderGrid(); else loadArticles();
+function setCat(c){
+  cat = c; sent = "All";
+  document.querySelectorAll(".pill[data-cat]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-cat")===c); });
+  document.querySelectorAll(".pill[data-sent]").forEach(function(b){ b.classList.remove("active"); });
+  renderGrid();
+  document.getElementById("mobile-menu").style.display = "none";
 }
 
-function handleSearch(){
-  query = document.getElementById("search").value;
+function setSent(s){
+  sent = s; cat = "All";
+  document.querySelectorAll(".pill[data-sent]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-sent")===s); });
+  document.querySelectorAll(".pill[data-cat]").forEach(function(b){ b.classList.remove("active"); });
   renderGrid();
 }
 
+function doSearch(){ query = document.getElementById("search").value; renderGrid(); }
 function toggleMenu(){
-  var m=document.getElementById("mobile-menu");
+  var m = document.getElementById("mobile-menu");
   m.style.display = m.style.display==="none" ? "flex" : "none";
-  m.style.flexDirection = "column";
 }
 
-/* ── countdown ── */
 setInterval(function(){
   secs--;
-  if(secs<=0){ secs=300; loadArticles(); loadStats(); }
+  if(secs<=0){ secs=300; load(); loadStats(); }
   var m=Math.floor(secs/60), s=secs%60;
   document.getElementById("refresh-timer").textContent="Next refresh: "+m+":"+(s<10?"0":"")+s;
 },1000);
 
-/* ── init ── */
-loadArticles();
+load();
 loadStats();
 </script>
 </body>
