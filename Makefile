@@ -3,7 +3,6 @@ frontend:
 
 scrape:
 	venv\\Scripts\\python.exe main.py
-	venv\\Scripts\\python.exe classify_live.py
 
 scrape-stream:
 	venv\\Scripts\\python.exe main.py --stream

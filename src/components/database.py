@@ -144,6 +144,23 @@ class PostgreSQLStorage(BaseStorage):
             row = session.get(ESGArticle, article_id)
             return (row.gemini_summary or "") if row else ""
 
+    def delete_irrelevant(self) -> int:
+        """Permanently removes Irrelevant articles from the database."""
+        with Session(self._engine) as session:
+            rows = session.scalars(
+                select(ESGArticle).where(
+                    (ESGArticle.esg_category == "Irrelevant") |
+                    (ESGArticle.relevant == False)
+                )
+            ).all()
+            count = len(rows)
+            for row in rows:
+                session.delete(row)
+            session.commit()
+        if count:
+            log.info("Removed " + str(count) + " irrelevant articles")
+        return count
+
     def delete_old_articles(self, days: int = 7) -> int:
         from datetime import datetime, timedelta, timezone
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)

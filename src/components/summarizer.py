@@ -5,22 +5,23 @@ from src.logger import get_logger
 log = get_logger(__name__)
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
-SUMMARY_PROMPT = """/no_think
-Summarize this ESG news article in three sections. Be specific — include company names, numbers, regulations.
+PREFERRED_MODELS = ["qwen2.5:1.5b", "qwen2.5:3b", "phi3.5:latest", "phi3.5"]
 
-Title: {{TITLE}}
-Content: {{CONTENT}}
+SUMMARY_PROMPT = """Summarize this ESG article in exactly this format. Be specific with names, numbers, regulations. Do not repeat these instructions back.
 
 OVERVIEW
-2-3 sentences on what happened, who is involved, and why it matters for carbon management and ESG compliance.
+2-3 sentences: what happened, who is involved, why it matters for ESG/carbon compliance.
 
 KEY POINTS
-- First specific fact, number, or policy name from the article
-- Second key detail or business implication
-- Third ESG significance or regulatory impact
+- one specific fact from the article
+- one business implication
+- one regulatory or ESG significance
 
 ESG IMPACT
-1-2 sentences on real-world implications for businesses in carbon management and sustainability reporting."""
+1-2 sentences on what this means for businesses doing carbon accounting or sustainability reporting.
+
+Title: {{TITLE}}
+Article: {{CONTENT}}"""
 
 
 class Summarizer:
@@ -42,14 +43,12 @@ class Summarizer:
         try:
             r = self._session.get(OLLAMA_HOST + "/api/tags", timeout=5)
             if r.status_code != 200:
-                log.warning("Ollama not available for summarization")
                 return
             models = [m["name"] for m in r.json().get("models", [])]
             if not models:
                 return
-            preferred = ["qwen2.5:1.5b","phi3.5:latest","phi3.5","qwen2.5:3b","qwen2.5:latest"]
             self._model = models[0]
-            for p in preferred:
+            for p in PREFERRED_MODELS:
                 if p in models:
                     self._model = p
                     break
@@ -61,41 +60,51 @@ class Summarizer:
     def summarize(self, title: str, body: str) -> str:
         if not self._ready or not self._model:
             return ""
-
-        # use body if available otherwise title only
         content = (body or "").strip()
         if len(content) < 50:
             content = (title or "").strip()
         if not content:
             return ""
-
-        content = content[:1_200]
-        prompt  = SUMMARY_PROMPT.replace("{{TITLE}}", (title or "")[:200]).replace("{{CONTENT}}", content)
-
+        content = content[:1_000]
+        prompt = SUMMARY_PROMPT.replace("{{TITLE}}", (title or "")[:200]).replace("{{CONTENT}}", content)
         try:
             resp = self._session.post(
                 OLLAMA_HOST + "/api/generate",
                 json={
-                    "model":  self._model,
-                    "prompt": prompt,
-                    "stream": False,
-                    "think":  False,
-                    "options": {"temperature": 0.3, "num_predict": 400},
+                    "model": self._model, "prompt": prompt, "stream": False, "think": False,
+                    "options": {"temperature": 0.3, "num_predict": 350},
                 },
-                timeout=180,
+                timeout=90,
             )
             resp.raise_for_status()
             raw = resp.json().get("response", "")
             raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
             raw = re.sub(r"</?think>", "", raw).strip()
-            if not raw:
-                log.warning("Empty summary response")
-                return ""
-            log.info("Summary generated via Ollama: " + self._model)
+            if not raw or "OVERVIEW" not in raw.upper():
+                log.warning("Malformed summary, retrying once with shorter input")
+                return self._retry_short(title, body)
+            log.info("Summary generated: " + self._model)
             return raw.strip()
         except requests.exceptions.Timeout:
             log.warning("Summarizer timed out")
             return ""
         except Exception as e:
             log.warning("Summarizer error: " + str(e)[:80])
+            return ""
+
+    def _retry_short(self, title: str, body: str) -> str:
+        """One retry with a much shorter prompt for weak models."""
+        content = (body or title or "")[:400]
+        prompt = "Summarize in 3 short sentences for an ESG business audience:\n\n" + content
+        try:
+            resp = self._session.post(
+                OLLAMA_HOST + "/api/generate",
+                json={"model": self._model, "prompt": prompt, "stream": False, "think": False,
+                      "options": {"temperature": 0.3, "num_predict": 150}},
+                timeout=60,
+            )
+            raw = resp.json().get("response", "")
+            raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+            return ("OVERVIEW\n" + raw.strip()) if raw.strip() else ""
+        except Exception:
             return ""
