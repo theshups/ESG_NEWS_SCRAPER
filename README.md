@@ -1,11 +1,5 @@
 ﻿---
-title: ESG Updates
-emoji: 🌱
-colorFrom: green
-colorTo: blue
-sdk: docker
-app_port: 8000
-pinned: true
+ESG Updates
 ---
 
 ## Features
